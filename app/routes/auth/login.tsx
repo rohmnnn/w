@@ -16,18 +16,24 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const loginFormSchema = z.object({
-	email: z.string().min(2, {
-		message: "email must be at least 2 characters.",
-	}),
-	password: z.string().min(6, {
-		message: "Password must be at least 6 characters.",
-	}),
-});
+const loginFormSchema = z
+	.object({
+		email: z
+			.string()
+			.trim()
+			.toLowerCase()
+      .email({ message: "Invalid email address." })
+			.max(254, { message: "Email is too long." }),
+		password: z
+			.string()
+			.min(8, { message: "Password must be at least 8 characters." })
+	})
+	.strict();
 
 export default function LoginPage() {
 	const form = useForm<z.infer<typeof loginFormSchema>>({
 		resolver: zodResolver(loginFormSchema),
+		mode: "onSubmit",
 		defaultValues: {
 			email: "",
 			password: "",
@@ -96,9 +102,9 @@ export default function LoginPage() {
 									render={({ field }) => (
 										<FormItem>
 											<div className="flex items-center">
-												<Label htmlFor="password">
+												<FormLabel>
 													Password
-												</Label>
+												</FormLabel>
 												<a
 													href="#"
 													className="ml-auto text-sm underline-offset-4 hover:underline"
